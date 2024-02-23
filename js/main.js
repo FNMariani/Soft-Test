@@ -96,8 +96,8 @@ function startCards()
     //Create 144 sprite cards
     const cardsQty = 144;
     const cards = [];
-    const initialXOffset = 100;
-    const initialYOffset = 20;  
+    const initialXOffset = 0;
+    const initialYOffset = 50;  
 
     let endMovement = false;
     const cardsTextures = [
@@ -155,8 +155,8 @@ function startCards()
         sceneContainer.addChild(card);
     }
     let cardIndex = cards.length-1;
-    let secondStackX = 200;
-    let secondStackY = 20;
+    let secondStackX = 100;
+    let secondStackY = 50;
 
     function cardsComplete()
     {
@@ -178,10 +178,61 @@ function startCards()
 }
 
 
-
+//EMOTES
 function startText()
 {
-    console.log("StartText()");
+    const textContainer = new PIXI.Container();
+    sceneContainer = textContainer;
+    app.stage.addChild(textContainer);
+
+    changeButtonVisibility(false);
+
+    //Load textures
+    const textTextures = [
+        PIXI.Texture.from('images/emotes/emote_cash.png'),
+        PIXI.Texture.from('images/emotes/emote_faceAngry.png'),
+        PIXI.Texture.from('images/emotes/emote_faceHappy.png'),
+        PIXI.Texture.from('images/emotes/emote_faceSad.png'),
+        PIXI.Texture.from('images/emotes/emote_heart.png'),
+        PIXI.Texture.from('images/emotes/emote_heartBroken.png'),
+    ];
+
+    const text = new PIXI.Text('cash');
+    text.x = Math.round(app.screen.width / 2) - Math.round(text.width / 2);
+    text.y = Math.round(app.screen.height / 2) - Math.round(text.height / 2);
+    textContainer.addChild(text);
+
+    const image = PIXI.Sprite.from(textTextures[0]);
+    image.scale.set(3);
+    image.x = Math.round(app.screen.width / 2) + Math.round(text.width / 2) + Math.round(image.width / 2);
+    image.y = Math.round(app.screen.height / 2) - Math.round(image.height / 2);
+    textContainer.addChild(image);
+
+    const words = ["cash", "faceAngry", "faceHappy", "faceSad", "heart", "heartBroken"]; 
+
+    function generateText()
+    {
+        let rIndex = Math.floor(Math.random() * words.length);
+        text.text = words[rIndex];
+        let fsize = Math.random() * 10 + 14;
+        text.style.fontSize =  fsize + "px";
+        text.x = Math.round(app.screen.width / 2) - Math.round(text.width / 2);
+        text.y = Math.round(app.screen.height / 2) - Math.round(text.height / 2);
+
+        image.texture = textTextures[rIndex]
+        image.x = Math.round(app.screen.width / 2) + Math.round(text.width / 2) + Math.round(image.width / 2);
+        image.y = Math.round(app.screen.height / 2) - Math.round(image.height / 2);
+    };
+
+    //Generate text every 2 seconds
+    const seconds = 2;
+    const generateTextInterval = delay => {
+        clearInterval(lastIntervalId);
+        lastIntervalId = setInterval(() => {
+        generateText();
+        }, delay);
+    };
+    generateTextInterval(seconds * 1000);
 }
 
 function startParticles()
