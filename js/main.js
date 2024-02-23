@@ -1,4 +1,4 @@
-const app = new PIXI.Application({ background: '#1099bb', resizeTo: window });
+const app = new PIXI.Application({ background: '#1099bb', resizeTo: window, antialias: true });
 document.body.appendChild(app.view);
 
 //-----------
@@ -68,6 +68,7 @@ function changeButtonVisibility(newVisibility)
 
 
 let lastIntervalId;
+let emitter;
 // create main container
 sceneContainer = new PIXI.Container();
 app.stage.addChild(sceneContainer);
@@ -79,6 +80,8 @@ function returnToMenu()
         sceneContainer.removeChild(sceneContainer.children[0])
     }
     changeButtonVisibility(true);
+
+    if(emitter !== undefined) emitter.stop();
 }
 
 
@@ -121,7 +124,6 @@ function startCards()
         if (endMovement)
         {
             clearInterval(lastIntervalId);
-            console.log("stop");
             return;
         } 
 
@@ -177,7 +179,7 @@ function startCards()
     moveCard(seconds * 1000);
 }
 
-
+//-----------
 //EMOTES
 function startText()
 {
@@ -235,12 +237,46 @@ function startText()
     generateTextInterval(seconds * 1000);
 }
 
+
+//-----------
+//PARTICLES
 function startParticles()
 {
-    console.log("StartParticles()");
+    const particlesContainer = new PIXI.Container();
+    sceneContainer = particlesContainer;
+    particlesContainer.position.set(100);
+    app.stage.addChild(particlesContainer);
+
+    changeButtonVisibility(false);
+
+    function createParticles()
+    {
+        const fx = new revolt.FX()
+
+        //Load the assets using PIXI Assets loader
+        PIXI.Assets.add({ alias: 'fx_settings', src: 'particles/default-bundle/default-bundle.json' });
+        PIXI.Assets.add({ alias: 'fx_spritesheet', src: 'particles/default-bundle/revoltfx-spritesheet.json' });
+
+        PIXI.Assets.load(['fx_settings', 'fx_spritesheet']).then(function (data) {
+            //Init the bundle
+            fx.initBundle(data.fx_settings);
+
+            //Get the emitter 
+            emitter = fx.getParticleEmitter('side-flamethrower');
+
+            //Inititialize it with the target PIXI container
+            emitter.init(particlesContainer);
+
+        });
+        
+        app.ticker.add(function () {
+            //Update the RevoltFX instance
+            fx.update();
+        });
+    }
+
+    createParticles();
 }
-
-
 
   
 
